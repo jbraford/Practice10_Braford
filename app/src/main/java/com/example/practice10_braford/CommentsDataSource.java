@@ -15,7 +15,7 @@ public class CommentsDataSource {
     private SQLiteDatabase database;
     private MySQLiteHelper dbHelper;
     private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
-            MySQLiteHelper.COLUMN_COMMENT };
+            MySQLiteHelper.COLUMN_COMMENT, MySQLiteHelper.COLUMN_RATING };
 
     public CommentsDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -29,9 +29,10 @@ public class CommentsDataSource {
         dbHelper.close();
     }
 
-    public Comment createComment(String comment) {
+    public Comment createComment(String comment, String rating) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_COMMENT, comment);
+        values.put(MySQLiteHelper.COLUMN_RATING, rating);
         long insertId = database.insert(MySQLiteHelper.TABLE_COMMENTS, null,
                 values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
@@ -54,7 +55,7 @@ public class CommentsDataSource {
         List<Comment> comments = new ArrayList<Comment>();
 
         Cursor cursor = database.query(MySQLiteHelper.TABLE_COMMENTS,
-                allColumns, null, null, null, null, null);
+                null, null, null, null, null, null);
 
         cursor.moveToFirst();
         while (cursor.moveToNext()) {
@@ -74,6 +75,7 @@ public class CommentsDataSource {
     private Comment cursorToComment(Cursor cursor) {
         Comment comment = new Comment();
         //comment.setId(cursor.getLong(0));
+        comment.setRating(cursor.getString( cursor.getColumnIndex( MySQLiteHelper.COLUMN_RATING ) ));
         comment.setId(cursor.getLong(cursor.getColumnIndex(MySQLiteHelper.COLUMN_ID)));
         comment.setComment(cursor.getString(1));
         return comment;
